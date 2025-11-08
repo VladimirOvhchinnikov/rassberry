@@ -1,3 +1,30 @@
+root:
+  node_id: "rk-1"
+  zone: "dc-1"
 admin:
   addr: ":8090"
   grpc_addr: ":8079"
+discovery:
+  enabled: true
+  advertise_internal: true
+telemetry:
+  level: INFO
+  buffer: 256
+  filters:
+    level: INFO
+    kernel: ""
+    scope: ""
+    component: ""
+domains:
+  - id: "site"
+    mode: "inproc"        # inproc | process | remote
+    kind: "site"          # фабрика по kind
+    entry: ""             # для remote (зарезервировано)
+    command: ""           # для process (зарезервировано)
+    feature_flags:
+      http: true
+      workers: true
+      log_forwarder: true
+    config:
+      http_addr: ":8081"
+      log_gateway: "127.0.0.1:8079"
