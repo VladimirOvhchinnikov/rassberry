@@ -11,12 +11,19 @@ import (
 type KernelRecord struct {
 	Manifest  contracts.Manifest `json:"manifest"`
 	Health    contracts.Health   `json:"health"`
+	Exports   *contracts.Exports `json:"exports,omitempty"`
 	UpdatedAt time.Time          `json:"updated_at"`
 }
 
 type DiscoveryRegistry struct {
 	mu      sync.RWMutex
 	kernels map[string]*KernelRecord
+}
+
+type DiscoveryRecord struct {
+	ID      string             `json:"id"`
+	Health  contracts.Health   `json:"health"`
+	Exports *contracts.Exports `json:"exports,omitempty"`
 }
 
 func NewDiscoveryRegistry() *DiscoveryRegistry {
@@ -72,6 +79,17 @@ func (r *DiscoveryRegistry) KernelHealth() map[string]contracts.Health {
 		res[id] = rec.Health
 	}
 	return res
+}
+
+func (r *DiscoveryRegistry) List() []DiscoveryRecord {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	out := make([]DiscoveryRecord, 0, len(r.kernels))
+	for id, rec := range r.kernels {
+		out = append(out, DiscoveryRecord{ID: id, Health: rec.Health, Exports: rec.Exports})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out
 }
 
 func (r *DiscoveryRegistry) AggregateHealth() contracts.Health {
