@@ -1,0 +1,25 @@
+# Binaries
+/bin/
+/dist/
+/build/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Go cache & coverage
+*.out
+cover.out
+coverage.txt
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
