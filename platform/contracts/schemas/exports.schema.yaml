@@ -1,0 +1,57 @@
+$id: https://example.com/ffp/schemas/exports.schema.yaml
+$schema: https://json-schema.org/draft/2020-12/schema
+title: Exports
+type: object
+additionalProperties: false
+properties:
+  network:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [name, protocol, address]
+      properties:
+        name: { type: string }
+        protocol: { type: string, enum: [http, grpc, tcp] }
+        address: { type: string }
+        version: { type: string }
+        endpoints: { type: array, items: { type: string } }
+  events:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [topic]
+      properties:
+        topic: { type: string }
+        description: { type: string }
+  streams:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [topic]
+      properties:
+        topic: { type: string }
+        group: { type: string }
+        dlq: { type: string }
+        delivery: { type: string }
+  cli:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name: { type: string }
+        description: { type: string }
+  local:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [name, interface]
+      properties:
+        name: { type: string }
+        interface: { type: string }
+        version: { type: string }

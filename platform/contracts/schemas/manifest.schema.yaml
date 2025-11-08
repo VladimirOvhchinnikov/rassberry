@@ -1,0 +1,17 @@
+$id: https://example.com/ffp/schemas/manifest.schema.yaml
+$schema: https://json-schema.org/draft/2020-12/schema
+title: Manifest
+type: object
+additionalProperties: true
+required: [kernel_id, version, scope]
+properties:
+  kernel_id: { type: string, minLength: 1 }
+  version:
+    type: string
+    pattern: '^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$'
+  scope: { type: string, enum: [root, domain, function] }
+  features: { type: array, items: { type: string } }
+  requires: { type: object }
+  resources: { type: object }
+  security: { type: object }
+  compat: { type: object }

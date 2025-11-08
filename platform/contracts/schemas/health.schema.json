@@ -1,0 +1,13 @@
+{
+  "$id": "https://example.com/ffp/schemas/health.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Health",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "since"],
+  "properties": {
+    "status": { "type": "string", "enum": ["ready", "degraded", "failed", "draining", "stopped"] },
+    "reason": { "type": "string" },
+    "since": { "type": "string", "format": "date-time" }
+  }
+}

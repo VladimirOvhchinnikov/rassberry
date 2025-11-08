@@ -1,0 +1,7 @@
+{
+  "$id": "https://example.com/ffp/schemas/lifecycle.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LifecycleState",
+  "type": "string",
+  "enum": ["load","init","configure","start","ready","degraded","failed","draining","stopped"]
+}
