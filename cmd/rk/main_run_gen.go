@@ -15,6 +15,8 @@ func main() {
 	cfgPath := flag.String("config", "", "Path to config file")
 	flag.Parse()
 
+	configPath = *cfgPath
+
 	cfg, err := LoadConfig(*cfgPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "config error:", err)

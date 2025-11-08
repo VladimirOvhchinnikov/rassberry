@@ -9,10 +9,13 @@ import (
 )
 
 type KernelRecord struct {
-	Manifest  contracts.Manifest `json:"manifest"`
-	Health    contracts.Health   `json:"health"`
-	Exports   *contracts.Exports `json:"exports,omitempty"`
-	UpdatedAt time.Time          `json:"updated_at"`
+	ID           string             `json:"id"`
+	Scope        contracts.Scope    `json:"scope"`
+	Manifest     contracts.Manifest `json:"manifest"`
+	Health       contracts.Health   `json:"health"`
+	Exports      *contracts.Exports `json:"exports,omitempty"`
+	RegisteredAt time.Time          `json:"registered_at"`
+	UpdatedAt    time.Time          `json:"updated_at"`
 }
 
 type DiscoveryRegistry struct {
@@ -38,11 +41,43 @@ func (r *DiscoveryRegistry) RegisterKernel(m contracts.Manifest) {
 		rec = &KernelRecord{}
 		r.kernels[m.KernelID] = rec
 	}
+	rec.ID = m.KernelID
+	rec.Scope = m.Scope
 	rec.Manifest = m
+	if rec.RegisteredAt.IsZero() {
+		rec.RegisteredAt = time.Now()
+	}
 	if rec.Health.Status == "" {
 		rec.Health = contracts.Health{Status: contracts.HealthReady, Since: time.Now()}
 	}
 	rec.UpdatedAt = time.Now()
+}
+
+func (r *DiscoveryRegistry) Register(rec KernelRecord) {
+	if rec.Manifest.KernelID == "" && rec.ID != "" {
+		rec.Manifest.KernelID = rec.ID
+	}
+	if rec.ID == "" {
+		rec.ID = rec.Manifest.KernelID
+	}
+	if rec.Scope == "" {
+		rec.Scope = rec.Manifest.Scope
+	}
+	if rec.RegisteredAt.IsZero() {
+		rec.RegisteredAt = time.Now()
+	}
+	rec.UpdatedAt = time.Now()
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	copy := rec
+	r.kernels[rec.ID] = &copy
+}
+
+func (r *DiscoveryRegistry) Unregister(id string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.kernels, id)
 }
 
 func (r *DiscoveryRegistry) UpdateHealth(id string, health contracts.Health) {
@@ -51,11 +86,18 @@ func (r *DiscoveryRegistry) UpdateHealth(id string, health contracts.Health) {
 	rec, ok := r.kernels[id]
 	if !ok {
 		rec = &KernelRecord{Manifest: contracts.Manifest{KernelID: id}}
+		rec.ID = id
 		r.kernels[id] = rec
 	}
 	rec.Health = health
+	if rec.Scope == "" {
+		rec.Scope = rec.Manifest.Scope
+	}
 	if rec.Health.Since.IsZero() {
 		rec.Health.Since = time.Now()
+	}
+	if rec.RegisteredAt.IsZero() {
+		rec.RegisteredAt = time.Now()
 	}
 	rec.UpdatedAt = time.Now()
 }

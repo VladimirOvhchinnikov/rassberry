@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 
-.PHONY: build test tidy run.rk run.rkctl
+.PHONY: build test tidy run.rk run.rkctl lint e2e
 
 build:
 	@mkdir -p bin
@@ -9,6 +9,10 @@ build:
 
 test:
 	go test ./...
+
+lint:
+	go vet ./...; \
+	gofmt -s -l . | (! grep .) || (echo "gofmt needed"; exit 1)
 
 tidy:
 	go work sync
@@ -20,7 +24,10 @@ tidy:
 	( cd cmd/rkctl && go mod tidy )
 
 run.rk:
-	go run ./cmd/rk
+	go run -tags rk_run ./cmd/rk -config ./cmd/rk/config.sample.yaml
 
 run.rkctl:
-	go run ./cmd/rkctl
+	go run -tags rkctl_run ./cmd/rkctl
+
+e2e:
+	go test -tags e2e ./tests/e2e -v
