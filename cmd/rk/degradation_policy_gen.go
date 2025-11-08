@@ -66,12 +66,14 @@ func (p *DegradationPolicy) Run(ctx context.Context, interval time.Duration) {
 					p.mu.Unlock()
 				case contracts.HealthDegraded, contracts.HealthFailed, contracts.HealthDraining, contracts.HealthStopped:
 					// сохранить и скрыть экспорты
+					p.mu.Lock()
 					if rec.Exports != nil {
-						p.mu.Lock()
-						if _, ok := p.snapshot[rec.ID]; !ok {
-							p.snapshot[rec.ID] = p.copyExports(rec.Exports)
-						}
-						p.mu.Unlock()
+						p.snapshot[rec.ID] = p.copyExports(rec.Exports)
+					} else if _, ok := p.snapshot[rec.ID]; !ok {
+						p.snapshot[rec.ID] = nil
+					}
+					p.mu.Unlock()
+					if rec.Exports != nil {
 						p.reg.SetExports(rec.ID, nil)
 					}
 				}
