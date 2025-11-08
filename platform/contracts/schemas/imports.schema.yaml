@@ -1,0 +1,48 @@
+$id: https://example.com/ffp/schemas/imports.schema.yaml
+$schema: https://json-schema.org/draft/2020-12/schema
+title: Imports
+type: object
+additionalProperties: false
+properties:
+  rpc:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name: { type: string }
+        version: { type: string }
+        optional: { type: boolean, default: false }
+  events:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [topic]
+      properties:
+        topic: { type: string }
+        optional: { type: boolean, default: false }
+  streams:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [topic]
+      properties:
+        topic: { type: string }
+        group: { type: string }
+        optional: { type: boolean, default: false }
+  storages:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [kind, name]
+      properties:
+        kind: { type: string, enum: [sql, kv, blob, cache, search, custom] }
+        name: { type: string }
+        optional: { type: boolean, default: false }
+  env:
+    type: array
+    items: { type: string }
