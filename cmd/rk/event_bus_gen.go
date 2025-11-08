@@ -27,18 +27,16 @@ func (b *InMemoryEventBus) Publish(ctx context.Context, topic string, msg any) e
 		b.mu.RUnlock()
 		return nil
 	}
-	// копируем, чтобы не держать блокировку во время отправки
-	copies := make([]*subscriber, 0, len(subs))
+	defer b.mu.RUnlock()
 	for _, sub := range subs {
-		copies = append(copies, sub)
-	}
-	b.mu.RUnlock()
-	for _, sub := range copies {
+		if sub.closed {
+			continue
+		}
 		select {
-		case sub.ch <- msg:
-		default:
 		case <-ctx.Done():
 			return ctx.Err()
+		case sub.ch <- msg:
+		default:
 		}
 	}
 	return nil
