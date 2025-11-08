@@ -9,4 +9,6 @@ use (
 	platform/telemetry
 	third_party/google.golang.org/grpc
 	third_party/gopkg.in/yaml.v3
+        kernels/infra/log-forwarder
+        kernels/examples/site
 )
