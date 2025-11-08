@@ -19,10 +19,19 @@ func RunRootKernel(ctx context.Context, cfg RootConfig) error {
 	reg.RegisterKernel(contracts.Manifest{KernelID: "rk", Scope: contracts.RootScope, Version: "0.0.1"})
 
 	hub := NewLogHub(bus)
+	errCh := make(chan error, 2)
 
 	// старт gRPC LogGateway
 	go func() {
-		_ = StartLogGatewayServer(ctx, cfg.Admin.GRPCAddr, hub)
+		if err := StartLogGatewayServer(ctx, cfg.Admin.GRPCAddr, hub); err != nil {
+			if ctx.Err() != nil {
+				return
+			}
+			select {
+			case errCh <- err:
+			case <-ctx.Done():
+			}
+		}
 	}()
 
 	admin := NewAdminServer(cfg.Admin.Addr, reg, logger)
@@ -33,8 +42,6 @@ func RunRootKernel(ctx context.Context, cfg RootConfig) error {
 	ha := NewHealthAggregator(reg, bus, logger)
 	admin.SetHealthAggregator(ha)
 	go ha.Run(ctx, 2*time.Second)
-
-	errCh := make(chan error, 2)
 
 	go func() {
 		errCh <- admin.Start(ctx)
