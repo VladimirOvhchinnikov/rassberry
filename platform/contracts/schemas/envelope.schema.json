@@ -1,0 +1,24 @@
+{
+  "$id": "https://example.com/ffp/schemas/envelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "occurred_at"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "minLength": 1 },
+    "key": { "type": "string" },
+    "headers": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "properties": {
+        "traceparent": { "type": "string" },
+        "tenant": { "type": "string" },
+        "zone": { "type": "string" }
+      }
+    },
+    "payload": { "type": "string", "contentEncoding": "base64" },
+    "occurred_at": { "type": "string", "format": "date-time" }
+  }
+}
