@@ -18,6 +18,9 @@ func RunRootKernel(ctx context.Context, cfg RootConfig) error {
 	reg := NewDiscoveryRegistry()
 	reg.RegisterKernel(contracts.Manifest{KernelID: "rk", Scope: contracts.RootScope, Version: "0.0.1"})
 
+	dp := NewDegradationPolicy(reg)
+	go dp.Run(ctx, time.Second)
+
 	hub := NewLogHub(bus)
 
 	// старт gRPC LogGateway
