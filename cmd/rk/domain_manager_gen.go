@@ -30,6 +30,18 @@ func NewDomainManager(reg *DiscoveryRegistry, bus ports.EventBus, logger ports.L
 	return &DomainManager{reg: reg, bus: bus, logger: logger, rpc: rpc, runs: make(map[string]*domainRun)}
 }
 
+func (m *DomainManager) manages(spec DomainSpec) bool {
+	mode := spec.Mode
+	if mode == "" {
+		mode = "inproc"
+	}
+	if mode != "inproc" {
+		return false
+	}
+	_, ok := domainFactories[spec.Kind]
+	return ok
+}
+
 func (m *DomainManager) launchInproc(ctx context.Context, spec DomainSpec) error {
 	f, ok := domainFactories[spec.Kind]
 	if !ok {
@@ -82,6 +94,16 @@ func (m *DomainManager) stop(id string) {
 func (m *DomainManager) Reload(ctx context.Context, specs []DomainSpec) {
 	index := map[string]DomainSpec{}
 	for _, s := range specs {
+		if !m.manages(s) {
+			if m.logger != nil {
+				mode := s.Mode
+				if mode == "" {
+					mode = "inproc"
+				}
+				m.logger.Log(ctx, "DEBUG", "domain reload skipped", map[string]any{"id": s.ID, "mode": mode, "kind": s.Kind})
+			}
+			continue
+		}
 		index[s.ID] = s
 	}
 
