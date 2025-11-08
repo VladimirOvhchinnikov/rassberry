@@ -1,0 +1,10 @@
+go 1.22
+
+use (
+    platform/contracts
+    platform/ports
+    platform/runtime
+    platform/telemetry
+    cmd/rk
+    cmd/rkctl
+)
