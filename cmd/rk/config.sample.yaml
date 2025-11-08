@@ -1,0 +1,10 @@
+admin:
+  addr: ":8090"
+telemetry:
+  level: INFO
+  buffer: 256
+domains:
+  - id: "example"
+    mode: "inproc"   # inproc | process | remote
+    kind: "example"  # встроенный демонстрационный домен
+    config: {}
