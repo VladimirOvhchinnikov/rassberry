@@ -1,10 +1,12 @@
 go 1.22
 
 use (
-    platform/contracts
-    platform/ports
-    platform/runtime
-    platform/telemetry
-    cmd/rk
-    cmd/rkctl
+	cmd/rk
+	cmd/rkctl
+	platform/contracts
+	platform/ports
+	platform/runtime
+	platform/telemetry
+	third_party/google.golang.org/grpc
+	third_party/gopkg.in/yaml.v3
 )
